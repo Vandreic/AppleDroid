@@ -30,6 +30,10 @@ player_move_speed_y = 4
 # Highscore to keep track of score
 highscore_num = 0
 
+# Timer countdown
+countdown_start_time = 10 # Start countdown at 10 seconds
+countdown_timer_increase = 1 # Increase timer by 1 second
+
 
 # Main function to run the game loop and initialization
 def main():
@@ -48,11 +52,18 @@ def main():
     global highscore_num # Highscore count
     font_highscore = pygame.font.Font("assets\\font\\Boba Cups.ttf", 40) # Set font and size for highscore
     text_highscore = font_highscore.render(f"Score: {highscore_num}", True, pygame.color.Color("White")) # Render highscore in white
-    text_highscore_rect = text_highscore.get_rect(center=(screen_width / 2, screen_height / 15)) # Position highscore text
+    text_highscore_rect = text_highscore.get_rect(center=( (screen_width / 2, screen_height / 15))) # Position highscore text
     # End-screen: Highscore
     end_font_highscore = pygame.font.Font("assets\\font\\Boba Cups.ttf", 80)
     end_text_highscore = end_font_highscore.render(f"Highscore: {highscore_num}", True, pygame.color.Color("White"))
     end_text_highscore_rect = end_text_highscore.get_rect(center=(screen_width / 2, screen_height / 1.4))
+
+    # Countdown timer:
+    global countdown_start_time # Countdown timer start
+    global countdown_timer_increase # Increase countdown timer 
+    font_countdown_timer = pygame.font.Font("assets\\font\\Boba Cups.ttf", 25)
+    text_countdown_timer = font_countdown_timer.render(f"Timer: {00.0}", True, pygame.color.Color("White"))
+    text_countdown_timer_rect = text_countdown_timer.get_rect(center=((screen_width / 2, screen_height / 7.7)))
 
     # Player:
     global player_move_speed_x # X-axis player move speed
@@ -83,17 +94,28 @@ def main():
             # If the user clicks the 'X' button, exit the game
             if event.type == pygame.QUIT: # If "EXIT" is pressed
                 running = False # Stop game
+
         
         # If game is active (Show game)
         if game_active:  
             # Fill screen with grey color
             background_surface.fill(pygame.color.Color("gray60"))
+            
+            # Countdown timer
+            countdown_timer = round(pygame.time.get_ticks() / 1000, 1) # Countdown timer in seconds with 1 decimal
+            countdown_timer_text = round(countdown_start_time - countdown_timer, 1) # Initial countdown text
+            text_countdown_timer = font_countdown_timer.render(f"Timer: {countdown_timer_text}", True, pygame.color.Color("White")) # Update countdown text
 
             # Draw assets to screen
-            screen.blit(background_surface, (0, 0))
-            screen.blit(text_highscore, text_highscore_rect)
-            screen.blit(player_surf, player_rect)
-            screen.blit(apple_surf, apple_rect)
+            screen.blit(background_surface, (0, 0))                         # Background surface
+            screen.blit(text_highscore, text_highscore_rect)                # Highscore text
+            screen.blit(text_countdown_timer, text_countdown_timer_rect)    # Countdown timer
+            screen.blit(player_surf, player_rect)                           # Player
+            screen.blit(apple_surf, apple_rect)                             # Apple
+
+            # Check if countdown timer reaches 0
+            if countdown_timer_text <= 0:
+                game_active = False # End game (Show end-screen)
 
             keys = pygame.key.get_pressed()  # Get the state of all keyboard buttons
             # Check keyboard input and update player position
@@ -119,21 +141,20 @@ def main():
                 apple_rect.topleft = (new_apple_pos_x, new_apple_pos_y) # Move apple to new pos
                 highscore_num += 1 # Increase score
                 text_highscore = font_highscore.render(f"Score: {highscore_num}", True, pygame.color.Color("White")) # Update score text
-            
-            # *ADD COUNTDOWN TIMER*
-            if highscore_num == 10:
-                game_active = False # Change game active state
+                countdown_start_time += countdown_timer_increase # Increase countdown timer
         
         # If game is not active (Show end-screen)
         else:
             # Fill screen with green color
             background_surface.fill(pygame.color.Color("gray80")) 
+            
             # Update score text
             end_text_highscore = end_font_highscore.render(f"Highscore: {highscore_num}", True, pygame.color.Color("White"))
+            
             # Draw assets to screen
-            screen.blit(background_surface, (0, 0))
-            screen.blit(end_text_highscore, end_text_highscore_rect)
-            screen.blit(end_player_surf, end_player_rect)
+            screen.blit(background_surface, (0, 0))                     # Background surface
+            screen.blit(end_text_highscore, end_text_highscore_rect)    # Highscore text
+            screen.blit(end_player_surf, end_player_rect)               # Player image
     
 
         # Update the display to show the new frame
