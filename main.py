@@ -49,6 +49,11 @@ def main():
     # Get current time since game start
     game_start_time = round(pygame.time.get_ticks() / 1000, 1) # Convert to seconds with one decimal
 
+    # Spawn golden apple (Better than regular apples)
+    gold_apple_spawn_rate = 2 # Spawn rate of golden apples in seconds
+    spawn_gold_apple = pygame.USEREVENT + 1 # Create user-event
+    pygame.time.set_timer(spawn_gold_apple, gold_apple_spawn_rate*1000) # Spawn golden
+
     # Create a background surface
     background_surface = pygame.Surface((screen_width, screen_height))
 
@@ -113,7 +118,10 @@ def main():
                 countdown_start_timer_value = countdown_default_start_timer_value # Reset countdown timer to default start value
                 highscore_num = 0 # Reset highscore
                 game_active = True # Show game
-
+            
+            # If game active, execute user event: spawn golden apples
+            if game_active == True and event.type == spawn_gold_apple:
+                print("SPAWN!")
         
         # If game is active (Show game)
         if game_active:  
@@ -129,6 +137,7 @@ def main():
 
             countdown_timer_value = round(countdown_start_timer_value - elapsed_time, 1) # Start countdown timer
             text_countdown_timer = font_countdown_timer.render(f"Timer: {countdown_timer_value}", True, pygame.color.Color("White")) # Update text for countdown timer
+
 
             # Draw assets to screen
             screen.blit(background_surface, (0, 0))                         # Background surface
