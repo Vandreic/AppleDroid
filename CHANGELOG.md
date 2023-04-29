@@ -8,3 +8,10 @@ All changes to this project will be documented in this file.
 ### **Version 0.1**
 **Release date:** 29/04-2023
 * Created game
+
+---
+
+### **Version 0.2**
+**Release date:** 30/04-2023
+* Added countdown timer
+* Added end-screen
