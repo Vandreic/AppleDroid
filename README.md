@@ -1,6 +1,6 @@
 # ***AppleDroid***
-A small python game where you control an Android with the objective of collecting as many apples as possible.
-<br/>
+A small python game where you control an Android with the objective of collecting as many apples as possible. <br>
+<br>
 *Latest version:* 0.1
 
 ---
