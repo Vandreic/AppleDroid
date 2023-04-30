@@ -6,7 +6,13 @@ A small python game where you control an Android with the objective of collectin
 
 TO-DO:
 - BUG: Fix apple spawn so it do not spawn inside highscore & countdown text
-- ADD: Start-screen to game
+- BUG: Fix player & apple spawn after game restart (Create new x- & y-pos for new spawn)
+- Update code:
+-- Create functions to load images & text
+--- Update calculations for positioning (Use multiplication instead of division?)
+--- Update scale method to 'transform.rotozoom' (Sligthy better image quality)
+-- Create spawn function for apple
+-- Update general code structure
 """
 
 
@@ -49,11 +55,6 @@ def main():
     # Get current time since game start
     game_start_time = round(pygame.time.get_ticks() / 1000, 1) # Convert to seconds with one decimal
 
-    # Spawn golden apple (Better than regular apples)
-    gold_apple_spawn_rate = 2 # Spawn rate of golden apples in seconds
-    spawn_gold_apple = pygame.USEREVENT + 1 # Create user-event
-    pygame.time.set_timer(spawn_gold_apple, gold_apple_spawn_rate*1000) # Spawn golden
-
     # Create a background surface
     background_surface = pygame.Surface((screen_width, screen_height))
 
@@ -78,11 +79,26 @@ def main():
     player_surf = pygame.transform.scale(player_surf, (player_surf.get_width() * player_scale_num, player_surf.get_height() * player_scale_num,))  # Apply scaling to player (Use transform.rotozoom instead)
     player_rect = player_surf.get_rect(center=(100, 100)) # Set initial player position
 
-    # Apple:
+    # Apple
     apple_surf = pygame.image.load("assets\\apple.png").convert_alpha()
     apple_scale_num = 0.5
     apple_surf = pygame.transform.scale(apple_surf, (apple_surf.get_width() * apple_scale_num, apple_surf.get_height() * apple_scale_num,))
     apple_rect = apple_surf.get_rect(center=(250, 200))
+
+    # Start-screen: Game title text
+    start_font_game_title = pygame.font.Font("assets\\font\\Boba Cups.ttf", 70)
+    start_text_game_title = start_font_game_title.render(game_title, True, pygame.color.Color("White"))
+    start_text_game_title_rect = start_text_game_title.get_rect(center=(screen_width / 2, screen_height / 4))
+
+    # Start-screen: Game creator text
+    start_font_game_creator = pygame.font.Font("assets\\font\\Boba Cups.ttf", 30)
+    start_text_game_creator = start_font_game_creator.render("Created by Victor", True, pygame.color.Color("White"))
+    start_text_game_creator_rect = start_text_game_creator.get_rect(center=(screen_width / 2, screen_height / 2.8))
+
+    # Start-screen: Info text
+    start_font_info = pygame.font.Font("assets\\font\\Boba Cups.ttf", 44)
+    start_text_info = start_font_info.render("Press \"SPACE\" to play...", True, pygame.color.Color("White"))
+    start_text_info_rect = start_text_info.get_rect(center=(screen_width / 2, screen_height / 1.3))
 
     # End-screen: Highscore
     end_font_highscore = pygame.font.Font("assets\\font\\Boba Cups.ttf", 70)
@@ -103,6 +119,7 @@ def main():
     # Main game loop
     running = True # Game-loop running state (Flag to keep game running)
     game_active = True # Game active (Used to reach end-game)
+    game_show_start_screen = True # Flag for showing start screen
 
     while running: # While game-loop is running
 
@@ -112,19 +129,34 @@ def main():
             if event.type == pygame.QUIT: # If "EXIT" is pressed
                 running = False # Stop game
             
+            if game_show_start_screen == True and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                print("START!")
+                game_show_start_screen = False
+                game_active = True
+                game_start_time = round(pygame.time.get_ticks() / 1000, 1) # Reset game start time
+
             # If on end-screen and 'SPACE' key is pressed, reset game
             if game_active == False and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_start_time = round(pygame.time.get_ticks() / 1000, 1) # Reset game start time
                 countdown_start_timer_value = countdown_default_start_timer_value # Reset countdown timer to default start value
                 highscore_num = 0 # Reset highscore
                 game_active = True # Show game
-            
-            # If game active, execute user event: spawn golden apples
-            if game_active == True and event.type == spawn_gold_apple:
-                print("SPAWN!")
+
         
+        # If true, show start screen
+        if game_show_start_screen:
+            # Fill screen with grey color
+            background_surface.fill(pygame.color.Color("gray70"))
+
+            screen.blit(background_surface, (0, 0)) 
+            screen.blit(start_text_game_title, start_text_game_title_rect)
+            screen.blit(start_text_game_creator, start_text_game_creator_rect)
+            screen.blit(start_text_info, start_text_info_rect)              # Info text
+
+
+
         # If game is active (Show game)
-        if game_active:  
+        if game_active == True and game_show_start_screen == False:  
             # Fill screen with grey color
             background_surface.fill(pygame.color.Color("gray60"))
             
@@ -144,7 +176,7 @@ def main():
             screen.blit(text_highscore, text_highscore_rect)                # Highscore text
             screen.blit(text_countdown_timer, text_countdown_timer_rect)    # Countdown timer
             screen.blit(player_surf, player_rect)                           # Player
-            screen.blit(apple_surf, apple_rect)                             # Apple
+            screen.blit(apple_surf, apple_rect)                             # Apple (Regular)
 
 
             # Check if countdown timer reaches 0
@@ -180,12 +212,12 @@ def main():
 
                 countdown_start_timer_value += countdown_increase_time # Increase countdown timer
                 text_countdown_timer = font_countdown_timer.render(f"Timer: {countdown_timer_value}", True, pygame.color.Color("White")) # Update text for countdown timer
-        
 
+                
         # If game is not active (Show end-screen)
-        else:
+        elif game_active == False and game_show_start_screen == False:
             # Fill screen with green color
-            background_surface.fill(pygame.color.Color("gray80")) 
+            background_surface.fill(pygame.color.Color("gray70")) 
 
             # Update score text
             end_text_highscore = end_font_highscore.render(f"Highscore: {highscore_num}", True, pygame.color.Color("White"))
