@@ -134,7 +134,6 @@ def create_text(font_size=10, text="", x_pos=0, y_pos=0, screen=""):
 
     font_size          Set font size (Default: 10)
     text               Set text
-    text_color         Set text color (Default: White)
     x_pos              X-position for text (Center-based positioning)
     y_pos              Y-position for text (Center-based positioning)
     """
@@ -227,7 +226,7 @@ def main():
             elapsed_time = round(current_time - game_start_time, 1) # Calculate elapsed time since game start
             countdown_timer_value = round(countdown_start_timer_value - elapsed_time, 1) # Start countdown timer
 
-            # # Fill screen with grey color
+            # Fill screen with grey color
             background_surface.fill(pygame.color.Color("gray60"))
             # Draw background
             screen.blit(background_surface, (0, 0))
