@@ -1,3 +1,5 @@
-# Ignore "Original Downloads" assets folder & apple_gold.png
+# Ignore "Original Downloads" assets folder
 assets/Original Downloads
-assets/gold_apple.png
+
+# Ignore "__pycache__" folders and files within
+__pycache__/
