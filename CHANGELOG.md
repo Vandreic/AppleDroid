@@ -31,7 +31,7 @@ All changes to this project will be documented in this file.
 
 * Added gold apple
 * Major code and file organization overhaul
-  * Replaced single `main.py` with modular files
+  * Replaced `main.py` with modular files
     * `config.py` Contains game settings, asset paths, and gameplay behavior variables, including player settings
     * `game_logic.py` Manages the main game loop, event handling, and updates game components
     * `game_screen.py` Handles rendering and updating of game screens, displaying game elements, and navigation input
