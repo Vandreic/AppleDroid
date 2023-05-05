@@ -28,9 +28,9 @@ PLAYER_MOVE_SPEED_X = 4 # Player movement speed x-axis (in pixels)
 PLAYER_MOVE_SPEED_Y = 4 # Player movement speed y-axis (in pixels)
 
 # ---- Font paths ---- #
-FONT_PATH = "assets\\font\\boba_cups.ttf" # Default font path
+FONT_PATH = "assets/font/boba_cups.ttf" # Default font path
 
 # ---- Images paths ---- #
-PLAYER_IMAGE_PATH = "assets\\images\\player.png" # Player image path
-APPLE_IMAGE_PATH = "assets\\images\\apple.png" # Apple image path
-GOLD_APPLE_IMAGE_PATH ="assets\\images\\gold_apple.png" # Gold apple image path
+PLAYER_IMAGE_PATH = "assets/images/player.png" # Player image path
+APPLE_IMAGE_PATH = "assets/images/apple.png" # Apple image path
+GOLD_APPLE_IMAGE_PATH ="assets/images/gold_apple.png" # Gold apple image path
