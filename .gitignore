@@ -1,4 +1,4 @@
-# Ignore "Assets Ressource" assets folder
+# Ignore "Assets Ressource" folder
 assets/Ressources
 
 # Ignore "__pycache__" folders and files within
