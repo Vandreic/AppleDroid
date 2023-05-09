@@ -5,10 +5,8 @@ A small python game where you control an Android with the objective of collectin
 
 
 TO-DO:
-- BUG: Fix apple spawn
-       * No spawn inside highscore & countdown text
-       * No spawn inside player spawn area
-
+- Add spawn restrictions to gold apple (Combine files into one?)
+- Create menu buttons for start- and end-screen
 - Change "SPACE" key input to pygame keys event instead?
 """
 

@@ -1,5 +1,5 @@
-# Ignore "Original Downloads" assets folder
-assets/Original Downloads
+# Ignore "Assets Ressource" assets folder
+assets/Ressources
 
 # Ignore "__pycache__" folders and files within
 __pycache__/

@@ -51,3 +51,9 @@ class Player(pygame.sprite.Sprite):
     # Update function
     def update(self):
         self.keyboard_input() # Keyboard input
+
+    # Return player boundaries (Used to restrict apple-spawn)
+    def get_player_boundaries(self):
+        # Create dictionary with the player boundaries
+        values_dict = {"x_pos": self.rect.centerx, "y_pos": self.rect.centery, "width": self.rect.width, "height": self.rect.height}
+        return values_dict # Return dictionary

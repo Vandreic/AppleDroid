@@ -19,10 +19,6 @@ from game_components.collectibles import Apple, GoldApple
 
 class Game():
 
-    highscore_num = 0 # Highscore count
-    gold_apple_spawned = False # Flag to track if the gold apple is currently spawned
-    
-
     def __init__(self):
         pygame.init() # Initialize pygame
 
@@ -41,6 +37,12 @@ class Game():
 
         # Initialize gold apple timer with game start time
         self.gold_apple_last_check_time = self.game_start_time # Same value as game_start_time
+
+        # Create spawn flag for gold apple
+        self.gold_apple_spawned = False
+
+        # Create highscore counter
+        self.highscore_num = 0
 
         # Handle game screens
         self.game_screen = GameScreen(screen)
@@ -71,6 +73,7 @@ class Game():
 
         # Check if main screen is active
         if self.game_screen.active_game_screen == "main_screen":
+
             # Countdown timer
             current_time = round(pygame.time.get_ticks() / 1000, 1) # Get current time
             elapsed_time = round(current_time - self.game_start_time, 1) # Calculate elapsed time since game start
@@ -79,13 +82,28 @@ class Game():
             # Gold apple spawn timer
             gold_apple_time_passed = round(current_time - self.gold_apple_last_check_time, 1) # Calculate time passed since last check for gold apple spawn
 
+
+            # Draw highscore and cache text info 
+            self.game_screen.render_highscore(self.highscore_num) # Draw highscore
+            highscore_text_size = self.game_screen.cache_text_info(return_text_info="highscore") # Cache position and text size for highscore
+            
+            # Draw countdown timer and cache text info
+            self.game_screen.render_countdown_timer(self.countdown_timer_value) # Draw countdown timer
+            countdown_timer_text_size = self.game_screen.cache_text_info(return_text_info="countdown_timer") # Cache position and text size for countdown timer
+
+            # Get player boundaries (Used for apple-spawn restrictions)
+            player_boundaries = self.player.get_player_boundaries()
+
+            # Create dictionary to store apple-spawn restrictions
+            self.spawn_restrictions = {"highscore": highscore_text_size, "countdown_timer": countdown_timer_text_size, "player": player_boundaries}
+
             # Check if countdown timer reaches 0
             if self.countdown_timer_value <= 0:
                 self.game_screen.screen_manager("end_screen") # Change to end screen
                 self.countdown_start_timer_value = COUNTDOWN_DEFAULT_START_TIMER_VALUE # Reset countdown timer to default value
                 self.highscore_num = 0 # Reset highscore
                 self.player.respawn() # Respawn player to default position
-                self.apple.respawn(True) # Respawn apple to default position
+                self.apple.respawn(default_spawn_location=True) # Respawn apple to default position
 
             # Perform gold apple spawn/despawn check
             if gold_apple_time_passed >= GOLD_APPLE_CHECK_INTERVAL:
@@ -110,7 +128,7 @@ class Game():
 
                     # Collision with apple
                     if isinstance(apple, Apple):
-                        self.apple.respawn() # Respawn regular apple
+                        self.apple.respawn(avoid_spawn_coordinates=self.spawn_restrictions) # Respawn regular apple
                         self.highscore_num += 1 # Increase highscore
                         self.countdown_start_timer_value += APPLE_TIME_BONUS # Increase countdown timer
 
