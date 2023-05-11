@@ -11,8 +11,7 @@ manages the countdown timer, highscore, and gold apple spawn/despawn logic, and 
 import pygame
 import random
 import sys
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, GAME_TITLE, COUNTDOWN_DEFAULT_START_TIMER_VALUE, APPLE_TIME_BONUS, GOLD_APPLE_TIME_BONUS, GOLD_APPLE_CHECK_INTERVAL
-from config import GOLD_APPLE_SPAWN_CHANCE
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, FRAME_RATE, GAME_TITLE, COUNTDOWN_DEFAULT_START_TIMER_VALUE, APPLE_TIME_BONUS, GOLD_APPLE_TIME_BONUS, GOLD_APPLE_CHECK_INTERVAL, GOLD_APPLE_SPAWN_CHANCE
 from game_components.ui import GameScreen
 from game_components.character import Player
 from game_components.collectibles import Apple, GoldApple
@@ -82,18 +81,15 @@ class Game():
             # Gold apple spawn timer
             gold_apple_time_passed = round(current_time - self.gold_apple_last_check_time, 1) # Calculate time passed since last check for gold apple spawn
 
+            # Send updated values of highscore and countdown timer to game screen
+            self.game_screen.update_text(text_to_update="highscore", new_text_value=self.highscore_num) # Highscore
+            self.game_screen.update_text(text_to_update="countdown_timer", new_text_value=self.countdown_timer_value) # Countdown timer
 
-            # Draw highscore and cache text info 
-            self.game_screen.render_highscore(self.highscore_num) # Draw highscore
+            # Get position and text size from texts (Used for apple-spawn restrictions)
             highscore_text_size = self.game_screen.cache_text_info(return_text_info="highscore") # Cache position and text size for highscore
-            
-            # Draw countdown timer and cache text info
-            self.game_screen.render_countdown_timer(self.countdown_timer_value) # Draw countdown timer
             countdown_timer_text_size = self.game_screen.cache_text_info(return_text_info="countdown_timer") # Cache position and text size for countdown timer
-
             # Get player boundaries (Used for apple-spawn restrictions)
             player_boundaries = self.player.get_player_boundaries()
-
             # Create dictionary to store apple-spawn restrictions
             self.spawn_restrictions = {"highscore": highscore_text_size, "countdown_timer": countdown_timer_text_size, "player": player_boundaries}
 

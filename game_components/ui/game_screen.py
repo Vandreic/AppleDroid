@@ -8,8 +8,6 @@ including the start-, main-, and end-screen. It displays game elements such as s
 (player and collectibles) and manages user input for navigating between screens.
 """
 
-# Fix highsores for end-screen
-
 
 import pygame
 import sys
@@ -23,11 +21,14 @@ class GameScreen():
     def __init__(self, screen):
         self.screen = screen # Store game screen
         self.selected_btn = 0 # Store selected button (Default: 0)
-        self.update_delay = 0.1  # Set a update delay for key input (in seconds)
+        self.key_input_update_delay = 0.1  # Set update delay for key input (in seconds) 
+
+        # Store variables values from Main Screen
+        self.highscore = 0 # Highscore
+        self.countdown_timer = 0 # Countdown timer
 
         self.clock = pygame.time.Clock()  # Initialize a Clock object
-        self.last_update = pygame.time.get_ticks()  # Store the current time
-        
+        self.game_start_time = pygame.time.get_ticks()  # Get current time since game / screen start
 
     # Create and draw text
     def draw_text(self, text="", font_size=10, color="White", x_pos=0, y_pos=0, return_text_info=False):
@@ -74,6 +75,24 @@ class GameScreen():
         text_font = text_info["text_font"] # Get text size and font
         text_surface = text_font.render(text_info["text"], True, pygame.color.Color(highlight_color)).convert_alpha() # Render highlighted text surface (Changes text color)
         self.screen.blit(text_surface, text_info["text_rect"]) # Draw highlighted text on screen
+
+    def update_text(self, text_to_update=None, new_text_value=None):
+        """Updates texts with new values from main screen
+        Gets updated texts from main screen and stores them in local variables
+        
+        Texts: Highscore & Countdown Timer
+
+        Parameters:
+            text_to_update (str):   Text to update
+        Returns:
+            None
+        """
+        # Check which text to update
+        if text_to_update == "highscore": # Highscore
+            self.highscore = new_text_value
+        elif text_to_update == "countdown_timer": # Countdown Timer
+            self.countdown_timer = new_text_value
+        
 
     # Start screen
     def start_screen(self):
@@ -137,11 +156,11 @@ class GameScreen():
         self.screen.blit(self.background_surface, (0, 0)) 
 
         # Draw highscore text and store text size
-        self.highscore_display = self.draw_text(text=f"Score: {self.highscore_num}", font_size=40, x_pos=50, y_pos=6, return_text_info=True) # Draw highscore text
-        self.cache_text_info(get_text_info=self.highscore_display) # Cache highscore text position and size
+        self.highscore_text = self.draw_text(text=f"Score: {self.highscore}", font_size=40, x_pos=50, y_pos=6, return_text_info=True) # Draw highscore text
+        self.cache_text_info(get_text_info=self.highscore_text) # Cache highscore text position and size
         # Draw countdown timer text and store text size
-        self.countdown_timer_display = self.draw_text(text=f"Timer: {self.countdown_timer_value}", font_size=25, x_pos=50, y_pos=11.5, return_text_info=True) # Draw countdown timer text
-        self.cache_text_info(get_text_info=self.countdown_timer_display) # Cache countdown timer text position and size
+        self.countdown_timer_text = self.draw_text(text=f"Timer: {self.countdown_timer_value}", font_size=25, x_pos=50, y_pos=11.5, return_text_info=True) # Draw countdown timer text
+        self.cache_text_info(get_text_info=self.countdown_timer_text) # Cache countdown timer text position and size
         
         # Draw player
         self.player_group.draw(self.screen)
@@ -157,7 +176,7 @@ class GameScreen():
         # Draw background
         self.screen.blit(self.background_surface, (0, 0))
         # Draw highscore
-        highscore = self.draw_text(text=f"Score: {self.highscore_num}", font_size=70, x_pos=50, y_pos=8)
+        highscore = self.draw_text(text=f"Score: {self.highscore}", font_size=70, x_pos=50, y_pos=8)
 
         # Load and draw player image (Image used for display)
         end_screen_player_surf = pygame.image.load(PLAYER_IMAGE_PATH).convert_alpha() # Load player.png with transparency (Used for pygame performance)
@@ -217,26 +236,27 @@ class GameScreen():
             self.end_screen()
             self.selected_btn = 0 # Reset selected button
     
-    
     # Render sprites (Get sprites to draw)
     def render_sprites(self, player_group="", sprite_group=""):
         self.player_group = player_group
         self.sprite_group = sprite_group
-
-    # Get highscore value
-    def render_highscore(self, highscore_num=0):
-        self.highscore_num = highscore_num
-
-    # Get countdown timer text
-    def render_countdown_timer(self, countdown_timer_value=""):
-        self.countdown_timer_value = countdown_timer_value
     
     # Cache the position and size of text elements for later use and return values (Used for highscore and countdown timer)
     def cache_text_info(self, get_text_info=None, return_text_info=""):
+        """Cache the position and size of text elements for later use and return values 
+        (Used for highscore and countdown timer)
+        
+        Parameters:
+            get_text_info (pygame.font.Font.render): Text to cache
+            return_text_info (str): Text to return
+        Returns:
+            If return_text_info is "highscore", return highscore text position and size
+                Otherwise, if return_text_info is "countdown_timer", return countdown timer text position and size
+        """
         # Cache text position and size
-        if get_text_info == self.highscore_display: # Highscore text
+        if get_text_info == self.highscore_text: # Highscore text
             self.highscore_text_info = get_text_info
-        elif get_text_info == self.countdown_timer_display: # Countdown timer text
+        elif get_text_info == self.countdown_timer_text: # Countdown timer text
             self.countdown_timer_text_info = get_text_info
             
         # Return cached text position and size
@@ -246,16 +266,16 @@ class GameScreen():
             return self.countdown_timer_text_info
     
     def keyboard_input(self):
-        """
-        Get keyboard input
+        """Get keyboard input
         Returns:
             If arrow keys or space key is pressed, return key input (str)
 
         """
         current_time = pygame.time.get_ticks()  # Get the current time
 
-        if current_time - self.last_update > self.update_delay*1000:  # Check key input after delay
-            self.last_update = current_time  # Update the last update time
+        # Check for key input after a delay
+        if current_time - self.game_start_time > self.key_input_update_delay*1000:
+            self.game_start_time = current_time  # Update game start time
             keys = pygame.key.get_pressed()  # Get key input
 
             if keys[pygame.K_UP]: # Up arrow
@@ -266,28 +286,25 @@ class GameScreen():
                 return "space"
             
     def update_selected_btn(self, active_screen="", total_btns=0):
-        """
-        When a button is selected, highlight it and check if space key is pressed
+        """When a button is selected, highlight it and check if space key is pressed
         Parameters:
             active_screen (str): Screen to update selected button on
+            total_btns (int): Total number of buttons on the screen
         Returns:
             If space key is pressed, return True (bool)
         """
         # Update selected button (Loop)
         if active_screen == "start_screen":
-            # Create a loop for the selected button
             if self.selected_btn < 0:
                 self.selected_btn = total_btns
             elif self.selected_btn > total_btns:
                 self.selected_btn = 0
         elif active_screen == "end_screen":
-            # Create a loop for the selected button
             if self.selected_btn < 0:
                 self.selected_btn = total_btns
             elif self.selected_btn > total_btns:
                 self.selected_btn = 0
 
-        key_is_pressed = False # Flag for "Space" key being pressed
         key_input = self.keyboard_input() # Get key input     
 
         # Update selected button based on key input
@@ -299,8 +316,7 @@ class GameScreen():
             return True
 
     def update_frame(self):
-        """
-        Update frames on active screen. 
+        """Update frames on active screen
         Used to constantly update graphics on active screen
         Note: This function needs to be updated constantly
         """

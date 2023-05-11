@@ -6,7 +6,6 @@ A small python game where you control an Android with the objective of collectin
 
 TO-DO:
 - Add spawn restrictions to gold apple (Combine files into one?)
-- Fix highscore for end-screen
 """
 
 
