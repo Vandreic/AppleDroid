@@ -143,6 +143,7 @@ class Game():
         else:
             self.countdown_timer_value = 0 # Reset countdown timer value
             self.game_start_time = round(pygame.time.get_ticks() / 1000, 1) # Reset current time since game start
+            self.player.respawn() # Respawn player to default position
             self.apple_group.remove(self.gold_apple) # Remove gold apple
             self.gold_apple_spawned = False # Update the gold apple spawn status
 
@@ -155,10 +156,6 @@ class Game():
             if event.type == pygame.QUIT:
                 pygame.quit() # Quit pygame
                 sys.exit() # Exit script
-            
-            # Check if 'SPACE' is pressed
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.game_screen.key_input(True) # Update game class with key input
 
 
         # Update the display to show the new frame

@@ -6,8 +6,7 @@ A small python game where you control an Android with the objective of collectin
 
 TO-DO:
 - Add spawn restrictions to gold apple (Combine files into one?)
-- Create menu buttons for start- and end-screen
-- Change "SPACE" key input to pygame keys event instead?
+- Fix highscore for end-screen
 """
 
 
