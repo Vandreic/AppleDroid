@@ -26,13 +26,9 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.rotozoom(self.image, 0, self.player_scale_num) # Apply scaling to player
         self.rect = self.image.get_rect(center=(self.x_pos, self.y_pos)) # Set initial player position
 
-    # Respawn player 
-    def respawn(self):
-        # Move player to default x- & y-pos
-        self.rect.center = (self.x_pos, self.y_pos)
-
     # Check keyboard input and update player position
     def keyboard_input(self):
+        """Handles keyboard input: Moves player based on keyboard input"""
         keys = pygame.key.get_pressed()  # Get the state of all keyboard buttons
 
         # LEFT ARROW
@@ -50,10 +46,24 @@ class Player(pygame.sprite.Sprite):
 
     # Update function
     def update(self):
+        """Call keyboard_input to respond to player action
+        Note: 'update' is a built-in method in pygame's Sprite class. It's called once per frame
+        """
         self.keyboard_input() # Keyboard input
+
+    # Respawn player 
+    def respawn(self):
+        """Handles respawn: Spawns player to default location"""
+        # Move player to default x- & y-pos
+        self.rect.center = (self.x_pos, self.y_pos)
 
     # Return player boundaries (Used to restrict apple-spawn)
     def get_player_boundaries(self):
+        """Return player boundaries: Used to restrict apple-spawn
+
+        Returns:
+            values_dict (dict): Dictionary with player boundaries
+        """
         # Create dictionary with the player boundaries
         values_dict = {"x_pos": self.rect.centerx, "y_pos": self.rect.centery, "width": self.rect.width, "height": self.rect.height}
-        return values_dict # Return dictionary
+        return values_dict

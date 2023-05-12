@@ -12,7 +12,7 @@ player settings, font paths, and image paths for game elements like the player, 
 SCREEN_WIDTH = 800  # Screen width (in pixels)
 SCREEN_HEIGHT = 600 # Screen height (in pixels)
 FRAME_RATE = 60 # Game frame rate (in frames per second)
-GAME_TITLE = "AppleDroid v0.4" # Game title
+GAME_TITLE = "AppleDroid v0.5" # Game title
 
 # ---- Gameplay behavior variables ---- #
 COUNTDOWN_DEFAULT_START_TIMER_VALUE = 10 # Default start value for countdown timer (in seconds)

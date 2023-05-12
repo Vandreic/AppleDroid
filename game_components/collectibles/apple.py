@@ -12,6 +12,7 @@ import pygame
 import random
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, APPLE_IMAGE_PATH
 
+
 class Apple(pygame.sprite.Sprite):
 
     # Default x- & y-pos
@@ -23,20 +24,37 @@ class Apple(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
-        self.image = apple_surf = pygame.image.load(APPLE_IMAGE_PATH).convert_alpha()
+        self.image = pygame.image.load(APPLE_IMAGE_PATH).convert_alpha()
         self.image = pygame.transform.rotozoom(self.image, 0, self.apple_scale_num)
         self.rect = self.image.get_rect(center=(self.x_default_pos, self.y_default_pos))
+        self.type = "apple" # Set apple type
+        self.spawn_restrictions = {} # Create spawn restrictions dictionary
+    
+    def update_spawn_restrictions(self, get_spawn_restrictions={}):
+        """Update spawn restrictions dictionary with coordinates
+
+        Parameters:
+            spawn_restrictions (dict): Spawn restrictions dictionary
+        Returns:
+            None
+        """
+        self.spawn_restrictions = get_spawn_restrictions
 
     # Respawn apple to new location
-    def respawn(self, avoid_spawn_coordinates=None, default_spawn_location=False):
-
+    def respawn(self, default_spawn_location=False):
+        """Handles respawn: Spawns apple to default or random location
+        
+        Parameters:
+            default_spawn_location (bool): Flag to determine if apple should spawn to default location
+        Returns:
+            None
+        """
         # Check if default spawn location in enabled
         if default_spawn_location == True:
             self.rect.center = (self.x_default_pos, self.y_default_pos) # Spawn to default position
+        
         # Spawn to random position
         else:
-            
-            coordinate_list = avoid_spawn_coordinates # Store spawn avoidance coordinates (dictionary)
 
             spawn_margin = 4 # Minimum spawn distance from screen edge (in pixels)
 
@@ -59,22 +77,22 @@ class Apple(pygame.sprite.Sprite):
 
                 # Create spawn avoidance coordinates ranges (Creates a rectangle area around texts and player)
                 # Highscore text
-                x_start_highscore = int(coordinate_list["highscore"]["x_pos"] - coordinate_list["highscore"]["width"] / 2) - int(self.image.get_width() / 2) - spawn_margin
-                x_end_highscore = int(coordinate_list["highscore"]["x_pos"] + coordinate_list["highscore"]["width"] / 2) + int(self.image.get_width() / 2) + spawn_margin
+                x_start_highscore = int(self.spawn_restrictions["highscore"]["x_pos"] - self.spawn_restrictions["highscore"]["width"] / 2) - int(self.image.get_width() / 2) - spawn_margin
+                x_end_highscore = int(self.spawn_restrictions["highscore"]["x_pos"] + self.spawn_restrictions["highscore"]["width"] / 2) + int(self.image.get_width() / 2) + spawn_margin
                 y_start_highscore = spawn_margin # Calculated value equals -1, so set to value of spawn_margin instead
-                y_end_highscore = int(coordinate_list["highscore"]["y_pos"] + coordinate_list["highscore"]["height"] / 2) + int(self.image.get_height() / 2) + spawn_margin
+                y_end_highscore = int(self.spawn_restrictions["highscore"]["y_pos"] + self.spawn_restrictions["highscore"]["height"] / 2) + int(self.image.get_height() / 2) + spawn_margin
 
                 # Countdown text
-                x_start_countdown = int(coordinate_list["countdown_timer"]["x_pos"] - coordinate_list["countdown_timer"]["width"] / 2) - int(self.image.get_width() / 2) - spawn_margin
-                x_end_countdown = int(coordinate_list["countdown_timer"]["x_pos"] + coordinate_list["countdown_timer"]["width"] / 2) + int(self.image.get_width() / 2) + spawn_margin
-                y_start_countdown = int(coordinate_list["countdown_timer"]["y_pos"] - coordinate_list["countdown_timer"]["height"] / 2) - int(self.image.get_height() / 2) - spawn_margin
-                y_end_countdown = int(coordinate_list["countdown_timer"]["y_pos"] + coordinate_list["countdown_timer"]["height"] / 2) + int(self.image.get_height() / 2) + spawn_margin
+                x_start_countdown = int(self.spawn_restrictions["countdown_timer"]["x_pos"] - self.spawn_restrictions["countdown_timer"]["width"] / 2) - int(self.image.get_width() / 2) - spawn_margin
+                x_end_countdown = int(self.spawn_restrictions["countdown_timer"]["x_pos"] + self.spawn_restrictions["countdown_timer"]["width"] / 2) + int(self.image.get_width() / 2) + spawn_margin
+                y_start_countdown = int(self.spawn_restrictions["countdown_timer"]["y_pos"] - self.spawn_restrictions["countdown_timer"]["height"] / 2) - int(self.image.get_height() / 2) - spawn_margin
+                y_end_countdown = int(self.spawn_restrictions["countdown_timer"]["y_pos"] + self.spawn_restrictions["countdown_timer"]["height"] / 2) + int(self.image.get_height() / 2) + spawn_margin
 
                 # Player
-                x_start_player = int(coordinate_list["player"]["x_pos"] - coordinate_list["player"]["width"] / 2) - int(self.image.get_width() / 2) - player_spawn_margin
-                x_end_player = int(coordinate_list["player"]["x_pos"] + coordinate_list["player"]["width"] / 2) + int(self.image.get_width() / 2) + player_spawn_margin
-                y_start_player = int(coordinate_list["player"]["y_pos"] - coordinate_list["player"]["height"] / 2) - int(self.image.get_height() / 2) - player_spawn_margin
-                y_end_player = int(coordinate_list["player"]["y_pos"] + coordinate_list["player"]["height"] / 2) + int(self.image.get_height() / 2) + player_spawn_margin
+                x_start_player = int(self.spawn_restrictions["player"]["x_pos"] - self.spawn_restrictions["player"]["width"] / 2) - int(self.image.get_width() / 2) - player_spawn_margin
+                x_end_player = int(self.spawn_restrictions["player"]["x_pos"] + self.spawn_restrictions["player"]["width"] / 2) + int(self.image.get_width() / 2) + player_spawn_margin
+                y_start_player = int(self.spawn_restrictions["player"]["y_pos"] - self.spawn_restrictions["player"]["height"] / 2) - int(self.image.get_height() / 2) - player_spawn_margin
+                y_end_player = int(self.spawn_restrictions["player"]["y_pos"] + self.spawn_restrictions["player"]["height"] / 2) + int(self.image.get_height() / 2) + player_spawn_margin
 
                 # Check player coordinates ranges: Make sure values does not exceed screen boundaries
                 if x_start_player < 0: 
@@ -87,7 +105,6 @@ class Apple(pygame.sprite.Sprite):
                     y_end_player = SCREEN_HEIGHT - int(self.image.get_height() / 2) - player_spawn_margin - spawn_margin
 
                 # Check if spawn coordinates are within the spawn avoidance coordinates
-                valid_spawn = False # Create spawn validity flag
                 # Check for highscore and countdown text
                 if (x_pos in range(x_start_highscore, x_end_highscore) or y_pos in range(y_start_highscore, y_end_highscore)) or (x_pos in range(x_start_countdown, x_end_countdown) or y_pos in range(y_start_countdown, y_end_countdown)):
                     # Create new random spawn coordinates

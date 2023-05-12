@@ -38,3 +38,12 @@ All changes to this project will be documented in this file.
     * `player.py` Represents the player character, handling image loading, positioning, movement, and respawn
     * `apple.py` and `gold_apple.py` Represents the apple(s) collectibles, managing image loading, positioning, and respawn
   * Updated import statements and dependencies accordingly
+
+---
+
+### **Version 0.5**
+
+**Release date:** 12/05-2023
+
+* Added menu buttons to start & end-screen
+* Fixed apple(s) spawn: No more spawn inside text elements or player
