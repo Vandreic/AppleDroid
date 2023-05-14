@@ -47,3 +47,17 @@ All changes to this project will be documented in this file.
 
 * Added menu buttons to start & end-screen
 * Fixed apple(s) spawn: No more spawn inside text elements or player
+
+---
+
+### **Version 0.6**
+
+**Release date:** 14/05-2023
+
+* Fixed player's diagonal movement speed
+* Updated player & apple(s) assets
+* Added backgrounds to screens
+* Added "Controls" & "About" screen
+* Added sound effects
+* Added game icon
+* Improved code documentation

@@ -1,18 +1,19 @@
 """
-AppleDroid v0.5
+AppleDroid v0.6
 
 A small python game where you control an Android with the objective of collecting as many apples as possible.
 
 
 TO-DO:
 - BUG:
-    - Fix apple spawn, so they do not spawn inside each other
+    - Fix apple spawn so they do not spawn inside each other
     - Fix gold apple spawn check: Gold apple keeps spawning after game ends 
       - Results in gold apple sometimes already being spawned after game restart
-
-- Add "Controls" and "About" screens
-- Add new graphics
-- Add sounds 
+      - Spawn timer aLso needs to reset after player collision
+- Add background music
+    - Problems loading music files using 'pygame.mixer.music'... I've tried: .wav, .ogg, .mp3, but none worked
+- Improve readibility of highscore and countdown timer texts
+- Improve readibility of code
 """
 
 

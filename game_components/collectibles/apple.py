@@ -10,31 +10,34 @@ The apple can respawn at a default or random location.
 
 import pygame
 import random
-from config import SCREEN_WIDTH, SCREEN_HEIGHT, APPLE_IMAGE_PATH
-
+from config import SCREEN_WIDTH, SCREEN_HEIGHT, APPLE_IMAGE_PATH, PURPLE_APPLE_COLLISION_SOUND_PATH
 
 class Apple(pygame.sprite.Sprite):
 
-    # Default x- & y-pos
-    x_default_pos = 200
-    y_default_pos = 200
+    # Apple scale factor (Picture is too big, so scale it down)
+    APPLE_SCLAE_NUM = 0.1
 
-    # Apple scale factor
-    apple_scale_num = 0.5
+    # Default x- & y-pos
+    DEFAULT_X_POS = 200
+    DEFAULT_Y_POS = 200
 
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load(APPLE_IMAGE_PATH).convert_alpha()
-        self.image = pygame.transform.rotozoom(self.image, 0, self.apple_scale_num)
-        self.rect = self.image.get_rect(center=(self.x_default_pos, self.y_default_pos))
-        self.type = "apple" # Set apple type
+        self.image = pygame.transform.rotozoom(self.image, 0, self.APPLE_SCLAE_NUM) # Resize apple image
+        self.rect = self.image.get_rect(center=(self.DEFAULT_X_POS, self.DEFAULT_Y_POS))
+        self.type = "apple" # Set apple type (To differentiate between apples)
+        self.collision_sound = pygame.mixer.Sound(PURPLE_APPLE_COLLISION_SOUND_PATH) # Load collision sound
         self.spawn_restrictions = {} # Create spawn restrictions dictionary
-    
-    def update_spawn_restrictions(self, get_spawn_restrictions={}):
-        """Update spawn restrictions dictionary with coordinates
 
+    def update_spawn_restrictions(self, get_spawn_restrictions={}):
+        """Update spawn restrictions dictionary with cached text information
+        Gets text positions and dimensions within a dictionary, which is used to create
+        boundaries around text, in order to create spawn restrictions for apple.
+        If we do not create spawn restrictions, then apple(s) can spawn on top of texts
+         
         Parameters:
-            spawn_restrictions (dict): Spawn restrictions dictionary
+            get_spawn_restrictions (dict): Dictionary with cached text position and size
         Returns:
             None
         """
@@ -42,23 +45,23 @@ class Apple(pygame.sprite.Sprite):
 
     # Respawn apple to new location
     def respawn(self, default_spawn_location=False):
-        """Handles respawn: Spawns apple to default or random location
+        """Respawn apple to random or default location
         
         Parameters:
             default_spawn_location (bool): Flag to determine if apple should spawn to default location
         Returns:
             None
         """
-        # Check if default spawn location in enabled
+        # If default_spawn_location is True, move apple to default location (Apple never despawns, only changes position)
         if default_spawn_location == True:
-            self.rect.center = (self.x_default_pos, self.y_default_pos) # Spawn to default position
+            self.rect.center = (self.DEFAULT_X_POS, self.DEFAULT_Y_POS)
         
-        # Spawn to random position
+        # Else, move apple to random location
         else:
 
             spawn_margin = 4 # Minimum spawn distance from screen edge (in pixels)
 
-            # Set minimum spawn distance from screen edge
+            # Define screen boundaries for spawn (Spawn within screen)
             x_min_pos = int(self.image.get_width() / 2) + spawn_margin
             x_max_pos = int(SCREEN_WIDTH - self.image.get_width() / 2) - spawn_margin
 
@@ -94,7 +97,7 @@ class Apple(pygame.sprite.Sprite):
                 y_start_player = int(self.spawn_restrictions["player"]["y_pos"] - self.spawn_restrictions["player"]["height"] / 2) - int(self.image.get_height() / 2) - player_spawn_margin
                 y_end_player = int(self.spawn_restrictions["player"]["y_pos"] + self.spawn_restrictions["player"]["height"] / 2) + int(self.image.get_height() / 2) + player_spawn_margin
 
-                # Check player coordinates ranges: Make sure values does not exceed screen boundaries
+                # Check player coordinates ranges: Make sure values does not exceed screen boundaries, as player moves
                 if x_start_player < 0: 
                     x_start_player = 0 + int(self.image.get_width() / 2) + player_spawn_margin + spawn_margin
                 if x_end_player > SCREEN_WIDTH:
@@ -104,16 +107,14 @@ class Apple(pygame.sprite.Sprite):
                 if y_end_player > SCREEN_HEIGHT:
                     y_end_player = SCREEN_HEIGHT - int(self.image.get_height() / 2) - player_spawn_margin - spawn_margin
 
-                # Check if spawn coordinates are within the spawn avoidance coordinates
+                # Check if spawn coordinates are within the spawn avoidance coordinates. If not, create new random spawn coordinates
                 # Check for highscore and countdown text
                 if (x_pos in range(x_start_highscore, x_end_highscore) or y_pos in range(y_start_highscore, y_end_highscore)) or (x_pos in range(x_start_countdown, x_end_countdown) or y_pos in range(y_start_countdown, y_end_countdown)):
-                    # Create new random spawn coordinates
                     x_pos = random.randint(x_min_pos, x_max_pos)
                     y_pos = random.randint(y_min_pos, y_max_pos)
                 
                 # Check for player
                 elif (x_pos in range(x_start_player, x_end_player) or y_pos in range(y_start_player, y_end_player)):
-                    # Create new random spawn coordinates
                     x_pos = random.randint(x_min_pos, x_max_pos)
                     y_pos = random.randint(y_min_pos, y_max_pos)
 
